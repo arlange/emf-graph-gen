@@ -310,7 +310,7 @@ class GraphProcessor(
         val deleteOperations: MutableList<DeleteEdge> = LinkedList<DeleteEdge>()
         for (edge in edgesToDelete){
             graph.edges.remove(edge)
-            DeleteEdge(
+            deleteOperations.add(DeleteEdge(
                 id = DeltaOperation.generateId(),
                 nodeAName = edge.a.name,
                 nodeAID = edge.a.id,
@@ -319,7 +319,7 @@ class GraphProcessor(
                 fromRegionName = region?.name ?: "root",
                 fromRegionID = region?.id ?: "root",
                 edgeID = edge.id,
-                serializeWithIDs = IDs)
+                serializeWithIDs = IDs))
         }
         graph.nodes.filterIsInstance<Region>().forEach { subRegion ->
             deleteOperations.addAll(deleteEdgesContaining(subRegion, subRegion.graph, node))
