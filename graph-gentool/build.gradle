@@ -27,6 +27,7 @@ test {
     useJUnitPlatform()
     testLogging.showStandardStreams = true
     finalizedBy jacocoTestReport // report is always generated after tests run
+    maxHeapSize = '8g'
 }
 
 jacocoTestReport {
@@ -48,6 +49,22 @@ jar {
     manifest {
         attributes 'Main-Class': application.mainClass
     }
+}
+
+tasks.register('runSto', JavaExec) {
+    group = 'application'
+    description = 'Run the STO instance generator (StoMainKt).'
+    mainClass = 'StoMainKt'
+    classpath = sourceSets.main.runtimeClasspath
+    maxHeapSize = '8g'
+}
+
+tasks.register('runStoCheck', JavaExec) {
+    group = 'application'
+    description = 'Run the STO Type-Square checker against a model instance file (StoCheckMainKt).'
+    mainClass = 'StoCheckMainKt'
+    classpath = sourceSets.main.runtimeClasspath
+    maxHeapSize = '8g'
 }
 
 apply plugin : "org.jetbrains.dokka"

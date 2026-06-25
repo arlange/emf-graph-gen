@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="sto" nsURI="vector.org" nsPrefix="STO">
+  <eClassifiers xsi:type="ecore:EClass" name="ConnectorType">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="slotType" upperBound="-1"
+        eType="#//SlotType" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="connectorProtInstance"
+        upperBound="-1" eType="#//ConnectorPrototype" eOpposite="#//ConnectorPrototype/type"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pluginPInstance" upperBound="-1"
+        eType="#//PLPrototype" eOpposite="#//PLPrototype/type"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SlotType">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavitytype" upperBound="-1"
+        eType="#//CavityType" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="slotBInstance" upperBound="-1"
+        eType="#//SlotBPrototype" eOpposite="#//SlotBPrototype/type"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="slotCInstance" upperBound="-1"
+        eType="#//SlotCPrototype" eOpposite="#//SlotCPrototype/type"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CavityType">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isSealed" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavityBInstance" upperBound="-1"
+        eType="#//CavityBPrototype" eOpposite="#//CavityBPrototype/type"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavityBSealedInstance"
+        upperBound="-1" eType="#//CavitySealedBPrototype" eOpposite="#//CavitySealedBPrototype/type"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavityCInstance" upperBound="-1"
+        eType="#//CavityCPrototype" eOpposite="#//CavityCPrototype/type"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavityCSealedInstance"
+        upperBound="-1" eType="#//CavitySealedCPrototype" eOpposite="#//CavitySealedCPrototype/type"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ConnectorPrototype">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="slotbprototype" upperBound="-1"
+        eType="#//SlotBPrototype" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//ConnectorType"
+        eOpposite="#//ConnectorType/connectorProtInstance"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="headerinstance" upperBound="-1"
+        eType="#//HeaderInstance" eOpposite="#//HeaderInstance/type"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="wiringconnectorinstance"
+        upperBound="-1" eType="#//WiringConnectorInstance" eOpposite="#//WiringConnectorInstance/type"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SlotBPrototype">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//SlotType"
+        eOpposite="#//SlotType/slotBInstance"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavitybprototype" upperBound="-1"
+        eType="#//CavityBPrototype" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavitysealedbprototype"
+        upperBound="-1" eType="#//CavitySealedBPrototype" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="slotAinstane" upperBound="-1"
+        eType="#//SlotAInstane" eOpposite="#//SlotAInstane/slotbprototype"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CavityBPrototype">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//CavityType"
+        eOpposite="#//CavityType/cavityBInstance"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isSealed" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false" unsettable="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="cavityNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="canDetect" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavityAinstance" upperBound="-1"
+        eType="#//CavityAInstance" eOpposite="#//CavityAInstance/type"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavityBInstance" upperBound="-1"
+        eType="#//CavityBInstance" eOpposite="#//CavityBInstance/type"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CavitySealedBPrototype">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isSealed" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true" unsettable="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="cavityNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sealMaterial" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//CavityType"
+        eOpposite="#//CavityType/cavityBSealedInstance"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavitySealedAInstnce" upperBound="-1"
+        eType="#//CavitySealedAInstance" eOpposite="#//CavitySealedAInstance/type"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavitySealedBInstance"
+        upperBound="-1" eType="#//CavitySealedBInstance" eOpposite="#//CavitySealedBInstance/type"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PLPrototype">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//ConnectorType"
+        eOpposite="#//ConnectorType/pluginPInstance"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="slotcprototype" upperBound="-1"
+        eType="#//SlotCPrototype" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pluginLocationInstance"
+        upperBound="-1" eType="#//PluginLocationInstance" eOpposite="#//PluginLocationInstance/type"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SlotCPrototype">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//SlotType"
+        eOpposite="#//SlotType/slotCInstance"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavitybprototype" upperBound="-1"
+        eType="#//CavityCPrototype" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavitysealedcprototype"
+        upperBound="-1" eType="#//CavitySealedCPrototype" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pluginLocationSlotCInstance"
+        upperBound="-1" eType="#//PluginLocationSlotCInstance" eOpposite="#//PluginLocationSlotCInstance/type"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CavityCPrototype">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isSealed" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false" unsettable="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="canDetect" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//CavityType"
+        eOpposite="#//CavityType/cavityCInstance"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pluginLocationCavityCInstance"
+        upperBound="-1" eType="#//PluginLocationCavityCInstance" eOpposite="#//PluginLocationCavityCInstance/type"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CavitySealedCPrototype">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isSealed" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true" unsettable="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sealMaterial" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//CavityType"
+        eOpposite="#//CavityType/cavityCSealedInstance"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pluginLocationSealedCavityCInstance"
+        upperBound="-1" eType="#//PluginLocationSealedCavityCInstance" eOpposite="#//PluginLocationSealedCavityCInstance/cavitysealedcprototype"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="HeaderInstance">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//ConnectorPrototype"
+        eOpposite="#//ConnectorPrototype/headerinstance"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="slotainstane" upperBound="-1"
+        eType="#//SlotAInstane" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SlotAInstane">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="slotbprototype" eType="#//SlotBPrototype"
+        eOpposite="#//SlotBPrototype/slotAinstane"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavityainstance" upperBound="-1"
+        eType="#//CavityAInstance" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavitysealedainstnce" upperBound="-1"
+        eType="#//CavitySealedAInstance" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CavityAInstance">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isSealed" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false" unsettable="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="canDetect" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="cavityNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//CavityBPrototype"
+        eOpposite="#//CavityBPrototype/cavityAinstance"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CavitySealedAInstance">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="cavityNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sealMaterial" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isSealed" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true" unsettable="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//CavitySealedBPrototype"
+        eOpposite="#//CavitySealedBPrototype/cavitySealedAInstnce"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="WiringConnectorInstance">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="slotbinstance" upperBound="-1"
+        eType="#//SlotBInstance" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//ConnectorPrototype"
+        eOpposite="#//ConnectorPrototype/wiringconnectorinstance"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="SlotBInstance">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavitybinstance" upperBound="-1"
+        eType="#//CavityBInstance" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavitysealedbinstance"
+        upperBound="-1" eType="#//CavitySealedBInstance" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CavityBInstance">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isSealed" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false" unsettable="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="canDetect" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="cavityNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//CavityBPrototype"
+        eOpposite="#//CavityBPrototype/cavityBInstance"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CavitySealedBInstance">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="cavityNumber" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isSealed" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true" unsettable="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sealMaterial" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//CavitySealedBPrototype"
+        eOpposite="#//CavitySealedBPrototype/cavitySealedBInstance"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PluginLocationInstance">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//PLPrototype"
+        eOpposite="#//PLPrototype/pluginLocationInstance"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pluginlocationslotcinstance"
+        upperBound="-1" eType="#//PluginLocationSlotCInstance" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PluginLocationSlotCInstance">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//SlotCPrototype"
+        eOpposite="#//SlotCPrototype/pluginLocationSlotCInstance"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pluginlocationcavitycinstance"
+        upperBound="-1" eType="#//PluginLocationCavityCInstance" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="pluginlocationsealedcavitycinstance"
+        upperBound="-1" eType="#//PluginLocationSealedCavityCInstance" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PluginLocationCavityCInstance">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isSealed" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="false" unsettable="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="canDetect" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//CavityCPrototype"
+        eOpposite="#//CavityCPrototype/pluginLocationCavityCInstance"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PluginLocationSealedCavityCInstance">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="cavitysealedcprototype"
+        eType="#//CavitySealedCPrototype" eOpposite="#//CavitySealedCPrototype/pluginLocationSealedCavityCInstance"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sealMaterial" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isSealed" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        defaultValueLiteral="true" unsettable="true"/>
+  </eClassifiers>
+</ecore:EPackage>
