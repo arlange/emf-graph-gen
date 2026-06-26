@@ -72,7 +72,6 @@ class StoSquareChecker(
 
     fun check(): List<StoViolation> {
         val rules: List<() -> List<StoViolation>> = listOf(
-            ::checkNavigability,
             ::checkBottomInstanceIsPartOfTopInstance,
             ::checkTypingRelationshipCongruence
             // Next steps go here, e.g.:
@@ -88,34 +87,78 @@ class StoSquareChecker(
     }
 
     /**
-     * bottomType must be able to navigate to bottomInstance (via
-     * [bottomTypeToBottomInstanceFeature]), and bottomInstance must in turn be able to
-     * navigate to topInstance (its container). Checked in that order; stops at the
-     * first broken leg instead of reporting both.
+     * Structural preconditions for this square: that the type navigation from
+     * bottomInstance/topInstance resolves to at most one object, and that
+     * bottomInstance/bottomType are each contained at most once by their parent. Not
+     * part of [check] - [scan] runs this for every square in the model as its own
+     * phase, before checking any STO conformance, and aborts before that second phase
+     * if any square's preconditions are violated. All four are evaluated and
+     * collected (they're independent of each other, not a layered chain of
+     * assumptions).
      */
-    private fun checkNavigability(): List<StoViolation> {
-        val bottomTypeFeature = bottomType.eClass().getEStructuralFeature(bottomTypeToBottomInstanceFeature)
-        if (bottomTypeFeature == null || bottomInstance !in asEObjectList(bottomType.eGet(bottomTypeFeature))) {
-            return listOf(
+    fun checkPreconditions(): List<StoViolation> {
+        val violations = mutableListOf<StoViolation>()
+        violations += checkTypedAtMostOnce(bottomInstance, "bottomInstance")
+        violations += checkTypedAtMostOnce(topInstance, "topInstance")
+        violations += checkContainedAtMostOnce(bottomInstance, "bottomInstance")
+        violations += checkContainedAtMostOnce(bottomType, "bottomType")
+        return violations
+    }
+
+    /**
+     * [obj]'s type-navigation feature must resolve to at most one object. Checked by
+     * inspecting the raw feature value directly (rather than the [typeOf] helper's
+     * `as? EObject` cast, which would silently return null - not flag a problem - if
+     * the feature turned out to hold more than one value).
+     */
+    private fun checkTypedAtMostOnce(obj: EObject, role: String): List<StoViolation> {
+        val featureName = typeFeatureNameByClass[obj.eClass().name] ?: "type"
+        val feature = obj.eClass().getEStructuralFeature(featureName) ?: return emptyList()
+        val types = asEObjectList(obj.eGet(feature))
+        return if (types.size <= 1) {
+            emptyList()
+        } else {
+            listOf(
                 StoViolation(
-                    rule = "navigability",
-                    message = "${describe(bottomInstance)} is not reachable from ${describe(bottomType)} " +
-                            "via '$bottomTypeToBottomInstanceFeature'"
+                    rule = "precondition-type",
+                    message = "${describe(obj)} ($role) is connected to ${types.size} types via " +
+                            "'$featureName', expected at most one"
                 )
             )
         }
+    }
 
-        if (bottomInstance.eContainer() !== topInstance) {
-            return listOf(
+    /**
+     * [child]'s containing feature must list it at most once. [child].eContainer()
+     * itself can never disagree (EMF maintains it as a single backpointer), so this
+     * instead inspects the parent's raw feature value directly, which can in
+     * principle hold the same child more than once.
+     */
+    private fun checkContainedAtMostOnce(child: EObject, role: String): List<StoViolation> {
+        val container = child.eContainer() ?: return emptyList()
+        val feature = child.eContainingFeature() ?: return emptyList()
+        val occurrences = asEObjectList(container.eGet(feature)).count { it === child }
+        return if (occurrences <= 1) {
+            emptyList()
+        } else {
+            listOf(
                 StoViolation(
-                    rule = "navigability",
-                    message = "${describe(bottomInstance)} cannot navigate to ${describe(topInstance)} " +
-                            "(not its containment child)"
+                    rule = "precondition-containment",
+                    message = "${describe(child)} ($role) is contained $occurrences times by " +
+                            "${describe(container)}, expected at most once"
                 )
             )
         }
+    }
 
-        return emptyList()
+    /**
+     * Normalizes the result of an eGet() call - a single EObject for a single-valued
+     * feature, or a Collection for a many-valued one - into a uniform List.
+     */
+    private fun asEObjectList(value: Any?): List<EObject> = when (value) {
+        is EObject -> listOf(value)
+        is Collection<*> -> value.filterIsInstance<EObject>()
+        else -> emptyList()
     }
 
     /**
@@ -123,10 +166,6 @@ class StoSquareChecker(
      * topInstance (its eContainer), i.e. reachable via a containment relationship -
      * not just cross-linked or unrelated. This is a prerequisite for the typing
      * congruence and bijection rules that build on top of it.
-     *
-     * Note: the second leg of [checkNavigability] already covers this same condition;
-     * this rule stays separate (and named "composition" rather than "navigability")
-     * for clearer diagnostics if/when the two are decoupled later.
      */
     private fun checkBottomInstanceIsPartOfTopInstance(): List<StoViolation> {
         return if (bottomInstance.eContainer() === topInstance) {
@@ -165,16 +204,6 @@ class StoSquareChecker(
                 )
             )
         }
-    }
-
-    /**
-     * Normalizes the result of an eGet() call - a single EObject for a single-valued
-     * feature, or a Collection for a many-valued one - into a uniform List.
-     */
-    private fun asEObjectList(value: Any?): List<EObject> = when (value) {
-        is EObject -> listOf(value)
-        is Collection<*> -> value.filterIsInstance<EObject>()
-        else -> emptyList()
     }
 
     private fun describe(obj: EObject): String = describeStatic(obj)
@@ -276,13 +305,30 @@ class StoSquareChecker(
         private val squaresByInstanceClasses: Map<Pair<String, String>, SquareKey> =
             knownSquares.keys.associateBy { it.topInstanceClass to it.bottomInstanceClass }
 
+        private class PreparedSquare(
+            val topType: EObject,
+            val bottomType: EObject,
+            val topInstance: EObject,
+            val bottomInstance: EObject,
+            val checker: StoSquareChecker
+        )
+
         /**
          * Walks the whole containment tree under [root] and checks every Type-Square
          * instance it finds (matched purely by the containment class pairs in the
          * catalog above), deriving topType/bottomType automatically via [typeOf].
+         *
+         * Runs in two phases: first, every square's structural preconditions
+         * ([StoSquareChecker.checkPreconditions]) are checked, in full, before any
+         * STO conformance check starts; if any square fails its preconditions, that's
+         * returned immediately and the conformance phase never runs. Only once every
+         * square's preconditions hold does the second phase check actual STO
+         * conformance ([StoSquareChecker.check]) for each of them.
          */
         fun scan(root: EObject): List<StoSquareScanResult> {
-            val results = mutableListOf<StoSquareScanResult>()
+            val prepared = mutableListOf<PreparedSquare>()
+            val unresolved = mutableListOf<StoSquareScanResult>()
+
             root.eAllContents().forEach { bottomInstance ->
                 val topInstance = bottomInstance.eContainer() ?: return@forEach
                 val key = squaresByInstanceClasses[topInstance.eClass().name to bottomInstance.eClass().name]
@@ -291,7 +337,7 @@ class StoSquareChecker(
                 val topType = typeOf(topInstance)
                 val bottomType = typeOf(bottomInstance)
                 if (topType == null || bottomType == null) {
-                    results.add(
+                    unresolved.add(
                         StoSquareScanResult(
                             topType ?: topInstance, bottomType ?: bottomInstance, topInstance, bottomInstance,
                             listOf(
@@ -313,9 +359,24 @@ class StoSquareChecker(
                     features.topTypeToBottomTypeFeature,
                     features.bottomTypeToBottomInstanceFeature
                 )
-                results.add(StoSquareScanResult(topType, bottomType, topInstance, bottomInstance, checker.check()))
+                prepared.add(PreparedSquare(topType, bottomType, topInstance, bottomInstance, checker))
             }
-            return results
+
+            // Phase 1: preconditions for every square, before any conformance check starts.
+            val preconditionViolations = prepared.mapNotNull { sq ->
+                val violations = sq.checker.checkPreconditions()
+                if (violations.isEmpty()) null
+                else StoSquareScanResult(sq.topType, sq.bottomType, sq.topInstance, sq.bottomInstance, violations)
+            }
+            if (preconditionViolations.isNotEmpty()) {
+                return unresolved + preconditionViolations
+            }
+
+            // Phase 2: actual STO conformance, only reached if every precondition held.
+            val conformanceResults = prepared.map { sq ->
+                StoSquareScanResult(sq.topType, sq.bottomType, sq.topInstance, sq.bottomInstance, sq.checker.check())
+            }
+            return unresolved + conformanceResults
         }
 
         /** Runs [scan] over every top-level root object in [resource]. */
