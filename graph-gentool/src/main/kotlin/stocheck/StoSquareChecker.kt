@@ -73,7 +73,8 @@ class StoSquareChecker(
     fun check(): List<StoViolation> {
         val rules: List<() -> List<StoViolation>> = listOf(
             ::checkBottomInstanceIsPartOfTopInstance,
-            ::checkTypingRelationshipCongruence
+            ::checkTypingRelationshipCongruence,
+            ::checkBottomTypeHasUniqueInstanceUnderTopInstance
             // Next steps go here, e.g.:
             // ::checkBottomInstanceTypedByBottomType,
             // ::checkTopInstanceTypedByTopType,
@@ -201,6 +202,44 @@ class StoSquareChecker(
                             "composition structure: type-of(container) = " +
                             "${viaContainerThenType?.let { describe(it) } ?: "null"}, but " +
                             "container-of(type) = ${viaTypeThenContainer?.let { describe(it) } ?: "null"}"
+                )
+            )
+        }
+    }
+
+    /**
+     * Among bottomType's declared instances (reachable via
+     * [bottomTypeToBottomInstanceFeature], the forward direction of the same STO
+     * relationship [typeOf] follows backwards) and topInstance's children via the
+     * same containment feature that holds bottomInstance, the intersection of those
+     * two sets must have exactly one element - i.e. topInstance has exactly one
+     * child typed by bottomType, not zero and not more than one.
+     */
+    private fun checkBottomTypeHasUniqueInstanceUnderTopInstance(): List<StoViolation> {
+        val bottomTypeFeature = bottomType.eClass().getEStructuralFeature(bottomTypeToBottomInstanceFeature)
+        val containingFeature = bottomInstance.eContainingFeature()
+        if (bottomTypeFeature == null || containingFeature == null) {
+            return listOf(
+                StoViolation(
+                    rule = "bottom-uniqueness",
+                    message = "Cannot resolve navigation between ${describe(bottomType)} and ${describe(topInstance)}"
+                )
+            )
+        }
+
+        val instancesOfBottomType = asEObjectList(bottomType.eGet(bottomTypeFeature))
+        val childrenOfTopInstance = asEObjectList(topInstance.eGet(containingFeature))
+        val intersectionSize = childrenOfTopInstance.count { child -> instancesOfBottomType.any { it === child } }
+
+        return if (intersectionSize == 1) {
+            emptyList()
+        } else {
+            listOf(
+                StoViolation(
+                    rule = "bottom-uniqueness",
+                    message = "${describe(topInstance)} has $intersectionSize child(ren) via " +
+                            "'${containingFeature.name}' that are instances of ${describe(bottomType)} " +
+                            "(via '$bottomTypeToBottomInstanceFeature'), expected exactly one"
                 )
             )
         }
