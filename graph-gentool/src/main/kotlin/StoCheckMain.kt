@@ -50,15 +50,19 @@ class StoCheckCommand : Callable<Int> {
 
         for (input in inputs) {
             val fileStart = System.currentTimeMillis()
+            val loadStart = System.currentTimeMillis()
             val modelResource = resourceSet.getResource(URI.createFileURI(input.absolutePath), true)
+            val loadElapsed = System.currentTimeMillis() - loadStart
+            val scanStart = System.currentTimeMillis()
             val results = StoSquareChecker.scan(modelResource)
+            val scanElapsed = System.currentTimeMillis() - scanStart
             val elapsed = System.currentTimeMillis() - fileStart
 
             val violatingResults = results.filter { it.violations.isNotEmpty() }
             totalSquares += results.size
             totalViolating += violatingResults.size
 
-            println("Checked ${results.size} Type-Square instance(s) in ${input.path} (${elapsed} ms).")
+            println("Checked ${results.size} Type-Square instance(s) in ${input.path} (${elapsed} ms; load=${loadElapsed} ms, scan=${scanElapsed} ms).")
             for (result in violatingResults) {
                 for (violation in result.violations) {
                     println("  [${violation.rule}] ${violation.message}")

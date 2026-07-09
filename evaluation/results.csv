@@ -1,0 +1,11 @@
+size_p,num_squares,load_ms,scan_ms,total_ms,total_ms_kind
+1,72,17,19,31,median_of_3
+5,216,21,22,45,median_of_3
+10,396,32,28,52,median_of_3
+50,1836,68,60,136,median_of_3
+100,3636,139,79,206,median_of_3
+500,18036,377,289,618,median_of_3
+1000,36036,549,636,1123,median_of_3
+5000,180036,1306,9842,10461,median_of_3
+10000,360036,2491,43302,43567,median_of_3
+50000,1800036,,,1872422,single_run
